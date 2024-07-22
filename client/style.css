@@ -1,0 +1,19 @@
+body{
+    text-align: center;
+}
+*{
+    font-family: roboto;
+}
+
+#btn{
+    font-size: larger;
+    font-weight: bold;
+    border-radius: 6px;
+    padding: 0.5rem .8rem;
+}
+#btn:active{
+    transform: scale(0.9);
+}
+.container{
+    margin-top: 2rem;
+}
