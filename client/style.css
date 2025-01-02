@@ -1,19 +1,8 @@
-body{
-    text-align: center;
-}
-*{
-    font-family: roboto;
-}
 
-#btn{
-    font-size: larger;
-    font-weight: bold;
-    border-radius: 6px;
-    padding: 0.5rem .8rem;
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f8f9fa;
 }
-#btn:active{
-    transform: scale(0.9);
-}
-.container{
-    margin-top: 2rem;
+h1 {
+    font-weight: 700;
 }

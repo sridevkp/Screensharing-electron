@@ -1,42 +1,54 @@
 const ipcRenderer = require('electron').ipcRenderer;
+const $ = require('jquery'); 
 
-const btn = document.getElementById("btn")
-const roomIdOutput = document.getElementById("room-id")
-const copyLink = document.getElementById("copy-link")
+const btn = document.getElementById("start-stop")
 
 const states = { START:"start", STOP:"stop"}
 var state = states.STOP
-const URL = "http://localhost:3000"
+const URL = "https://screensharing-electron.onrender.com"
 
-ipcRenderer.on("uuid", (event, id ) => {
-    roomIdOutput.value = id
-    copyLink.title = URL +"/view/?id="+id
+
+ipcRenderer.on("started-sharing", (event, uuid) => {
+    const link = `${URL}/view/?id=${id}`
+    $("#room-id").text(link)
+
+    $("#start-stop")
+        .removeClass("btn-danger")
+        .addClass("btn-primary")
+        .text("Start")
+
+    $("#live-label").show()
 })
 
-// ipcRenderer.on("url", (event, url ) => {
-//     URL = url
-// })
+ipcRenderer.on("stopped-sharing", event => {
+    $this
+        .removeClass("btn-danger")
+        .addClass("btn-primary")
+        .text("Start")
 
-btn.addEventListener( "click",  function(){
+    $("#live-label").hide()
+})
 
-    if( state == states.STOP  ){
+$("#start-stop").on("click", function(){
+    const $this = $(this);
+
+    if( $this.hasClass("btn-primary") ){
         ipcRenderer.send("start-share")
-        state = states.START
+        // $this
+        //     .removeClass("btn-primary")
+        //     .addClass("btn-danger")
+        //     .text("Stop")
     }else{
         ipcRenderer.send("stop-share")
-        state = states.STOP
+        // $this
+        //     .removeClass("btn-danger")
+        //     .addClass("btn-primary")
+        //     .text("Start")
     }
-    console.log(state)
+});
 
-    btn.innerText = state == states.STOP ? "Start 🟢" : "Stop 🟥"
 
-})
-
-// document.getElementById("copy").addEventListener("click", function(){
-//     const txt = roomIdOutput.value
-//     navigator.clipboard.writeText(txt)
-// })
-copyLink.addEventListener("click", function(){
-    const txt = roomIdOutput.value
-    navigator.clipboard.writeText(URL+"/view/?id="+txt)
+$("#copy-link").on("click", function(){
+    const id = $("#room-id").text()
+    navigator.clipboard.writeText( URL +"/view/?id=" +id)
 })

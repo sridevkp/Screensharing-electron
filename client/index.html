@@ -3,19 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SS</title>
+    <title>Share Screen</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="bootstrap.min.css">
+    <link rel="stylesheet" href="bootstrap-utilities.min.css">
     <link rel="stylesheet" href="style.css">
+    <script defer src="index.js"></script>
+
 </head>
 <body>
-    <h1 class="heading">Share Screen</h1>
-    <button id="btn">Start 🟢</button>
-
-    <div class="container">
-        <label for="room-id">Room-id :</label>
-        <input type="text" name="room-id" readonly id="room-id">
-        <!-- <button id="copy">Copy!</button> -->
-        <button id="copy-link">Copy Link!</button>
+    <div class="container-fluid py-3">
+        <div class="container text-center py-3">
+            <h1>Share Screen</h1>
+            <span class="label" id="live-label">live</span> 
+        </div>
+        <div class="text-center">
+            <button id="start-stop" type="button" aria-pressed="false" class="btn btn-primary px-5">Start</button>
+        </div>
+        <div class="container text-center my-5 py-3">
+            <div class="well">
+                <p class="font-italic"  id="room-id">
+                    http://localhost:9000/view
+                </p>
+            </div>
+            <button type="button" id="copy-link" class="btn btn-info mt-3" data-bs-toggle="tooltip" data-bs-placement="top" title="Copy to clipboard">Copy link</button>
+        </div>
     </div>
-    <script defer src="index.js"></script>
 </body>
 </html>
