@@ -8,25 +8,21 @@
     <link rel="stylesheet" href="bootstrap.min.css">
     <link rel="stylesheet" href="bootstrap-utilities.min.css">
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.socket.io/4.4.0/socket.io.min.js"></script>
     <script defer src="index.js"></script>
 
 </head>
 <body>
-    <div class="container-fluid py-3">
-        <div class="container text-center py-3">
-            <h1>Share Screen</h1>
-            <span class="label" id="live-label">live</span> 
+    <div class="container-fluid py-4" >
+        <h1 class="center-block d-inline" >Share Screen</h1>
+        <div class="text-center mt-5">
+            <button id="start-stop" type="button" aria-pressed="false" class="btn btn-primary btn-block px-5">Start</button>
         </div>
-        <div class="text-center">
-            <button id="start-stop" type="button" aria-pressed="false" class="btn btn-primary px-5">Start</button>
-        </div>
-        <div class="container text-center my-5 py-3">
-            <div class="well">
-                <p class="font-italic"  id="room-id">
-                    http://localhost:9000/view
-                </p>
+        <div class="container-fluid d-flex gap-3 mt-5 py-3 align-items-start" id="info">
+            <div class="flex-grow-1 w-75" >
+                <p class="font-italic w-75 p-2 d-block"  id="room-id"> </p>
             </div>
-            <button type="button" id="copy-link" class="btn btn-info mt-3" data-bs-toggle="tooltip" data-bs-placement="top" title="Copy to clipboard">Copy link</button>
+            <button type="button" disabled id="copy-link" class="btn btn-info" data-bs-toggle="tooltip" data-bs-placement="top" title="Copy to clipboard">Copy link</button>
         </div>
     </div>
 </body>

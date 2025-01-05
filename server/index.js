@@ -20,8 +20,9 @@ io.on( "connection",  socket => {
         console.log( room )
         socket.join( room )
     })
-    socket.on("screen-data", ( imgData, room ) => {
-        socket.to( room ).emit( "screen-data", imgData )
+    socket.on("video:chunk", ( chunk, room ) => {
+        console.log("chunk:")
+        socket.to( room ).emit( "video:chunk", chunk )
     })
 })
 

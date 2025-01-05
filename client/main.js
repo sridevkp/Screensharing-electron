@@ -1,65 +1,55 @@
-const { app, BrowserWindow, desktopCapturer, ipcMain  } = require('electron')
-const io = require("socket.io-client")
-const screenshot = require("screenshot-desktop")
-const { v4: uuidv4 } = require('uuid')
-
-const URL = "https://screensharing-electron.onrender.com"
-const socket = io(URL)
-var interval
-
-const FPS = 10
+const { app, BrowserWindow, desktopCapturer, ipcMain, screen  } = require('electron');
+// const screenshot = require("screenshot-desktop");
+const { v4: uuidv4 } = require('uuid');
 
 const createWindow = () => {
     const win = new BrowserWindow({
       width: 550,
-      height: 350,
+      height: 300,
       webPreferences: {
         nodeIntegration: true,
         contextIsolation : false
     }
-    })
+    });
     // win.webContents.openDevTools()
-    win.removeMenu()
-    win.loadFile('index.html')
+    win.removeMenu();
+    win.loadFile('index.html');
   }
 
-  app.whenReady().then(() => {
-    createWindow()
-  })
+app.whenReady().then(() => {
+  createWindow();
+});
 
-  app.on('window-all-closed', () => {
-    if( interval ) clearInterval(interval);
-    if (process.platform !== 'darwin') app.quit()
-  })
-
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-        createWindow()
-    }
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') app.quit();
 })
 
-ipcMain.on("start-share", function(event, arg) {
-  const room = uuidv4().split("-")[0];
-  socket.emit("join", room);
-  event.reply("started-sharing", room);
-  console.log(`sharing in room ${room}`)
-
-  interval = setInterval( () => {
-    screenshot().then( imgBuffer => {
-
-      const img = Buffer.from(imgBuffer).toString('base64')
-
-      socket.emit("screen-data", img, room )
-
-    }, 1000/FPS).catch( err => {
-      console.log(err)
-    })
-    
-  })
+app.on('activate', () => {
+  if (BrowserWindow.getAllWindows().length === 0) {
+    createWindow();
+  }
 })
 
-ipcMain.on("stop-share", function(event, arg) {
-  console.log('sharing stopped')
-  clearInterval(interval);
-  event.reply("stopped-sharing");
+ipcMain.handle("start:share", async function(event, arg) {
+  const uuid = uuidv4().split("-")[0];
+  console.log(`sharing in room ${uuid}`);
+  const src = await getPrimaryDisplaySource();
+  const srcId = src.id;
+  return { uuid, srcId }
 })
+
+async function captureScreen() {
+  const screenSource = await getPrimaryDisplaySource();
+  const screenshot = screenSource.thumbnail.toDataURL();
+  return screenshot;
+}
+
+async function getPrimaryDisplaySource(){
+  // const displays = screen.getAllDisplays();
+  // const primaryDisplay = displays[0];
+  // const { width, height } = primaryDisplay.size;
+
+  const sources = await desktopCapturer.getSources({ types: ['screen'] });
+  // const screenSource = sources.find((source) => source.name === primaryDisplay.name);
+  return sources[0];
+}
