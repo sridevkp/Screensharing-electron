@@ -130,3 +130,6 @@ dist
 .pnp.*
 
 build/
+
+bootstrap-grid.min.css
+bootstrap.rtl.min.css
