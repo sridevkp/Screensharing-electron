@@ -11,60 +11,28 @@ let isInitialized = false;
 // Set up video source
 videoElement.src = URL.createObjectURL(mediaSource);
 
-// Handle MediaSource initialization
-mediaSource.addEventListener('sourceopen', () => {
-    console.log("Media source open.")
-    if (!MediaSource.isTypeSupported('video/webm;codecs=vp8')) {
-        console.error('VP8 is not supported on this browser.');
-        alert('Your browser does not support the required video codec.');
-    }
+mediaSource.addEventListener("sourceopen", () => {
+    sourceBuffer = mediaSource.addSourceBuffer("video/webm; codecs=vp9");
 
-    try {
-        sourceBuffer = mediaSource.addSourceBuffer('video/webm;codecs=vp8');
-        console.log('SourceBuffer created successfully');
-        
-        sourceBuffer.mode = 'segments';  // Ensure we're using segmented mode
-        sourceBuffer.addEventListener('updateend', () => {
-            mediaSource.duration = 120;
-            if (queue.length > 0 && !sourceBuffer.updating) {
-                const chunk = queue.shift();
-                sourceBuffer.appendBuffer(new Uint8Array(chunk));
-            }
-        });
-    } catch (e) {
-        console.error('Error creating sourceBuffer:', e);
-    }
+    socket.on('video:chunk', async (chunk, uuid) => {
+        console.log('Received chunk:', chunk.byteLength);
+        const videoBlob = new Blob([chunk], { type: "video/webm" });
+        const arrayBuffer = await videoBlob.arrayBuffer();
+
+        if (sourceBuffer && !sourceBuffer.updating) {
+            sourceBuffer.appendBuffer(arrayBuffer);
+        } else {
+            console.warn("SourceBuffer is busy");
+        }
+    });
+    
+    videoElement.src = URL.createObjectURL(mediaSource);
 });
 
-function appendToSourceBuffer(chunk) {
-    if (!sourceBuffer || sourceBuffer.updating || !isInitialized) {
-        queue.push(chunk);
-        console.log("Source buffer unavailable")
-        return;
-    }
-    
-    try {
-        // Check if chunk is ArrayBuffer or ArrayBufferView
-        if (chunk instanceof ArrayBuffer || ArrayBuffer.isView(chunk)) {
-            sourceBuffer.appendBuffer(new Uint8Array(chunk));
-        } else {
-            console.error('Invalid chunk type:', typeof chunk);
-        }
-    } catch (e) {
-        console.error('Error appending buffer:', e);
-        if (e.name === 'QuotaExceededError') {
-            // If buffer is full, remove some data
-            if (sourceBuffer.buffered.length) {
-                sourceBuffer.remove(0, sourceBuffer.buffered.end(0) - 10);
-            }
-        }
-    }
-}
-
-// Handle incoming video chunks
-socket.on('video:chunk', (chunk, uuid) => {
-    console.log('Received chunk:', chunk.byteLength);
-    appendToSourceBuffer(chunk);
+mediaSource.addEventListener("sourceended", () => {
+    console.log("MediaSource has ended.");
+    mediaSource = new MediaSource(); // Recreate MediaSource
+    videoElement.src = URL.createObjectURL(mediaSource); // Reassign video source
 });
 
 // Room handling
@@ -80,8 +48,7 @@ if (!room) {
         console.error("Room ID is required");
     }
 }
-
-if (room) {
+else{
     socket.emit("join", room);
     console.log(`Joined room: ${room}`);
 }

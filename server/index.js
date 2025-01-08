@@ -21,7 +21,6 @@ io.on( "connection",  socket => {
         socket.join( room )
     })
     socket.on("video:chunk", ( chunk, room ) => {
-        console.log("chunk:")
         socket.to( room ).emit( "video:chunk", chunk )
     })
 })
