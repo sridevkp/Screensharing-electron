@@ -13,12 +13,19 @@ videoElement.src = URL.createObjectURL(mediaSource);
 
 // Handle MediaSource initialization
 mediaSource.addEventListener('sourceopen', () => {
+    console.log("Media source open.")
+    if (!MediaSource.isTypeSupported('video/webm;codecs=vp8')) {
+        console.error('VP8 is not supported on this browser.');
+        alert('Your browser does not support the required video codec.');
+    }
+
     try {
         sourceBuffer = mediaSource.addSourceBuffer('video/webm;codecs=vp8');
         console.log('SourceBuffer created successfully');
         
         sourceBuffer.mode = 'segments';  // Ensure we're using segmented mode
         sourceBuffer.addEventListener('updateend', () => {
+            mediaSource.duration = 120;
             if (queue.length > 0 && !sourceBuffer.updating) {
                 const chunk = queue.shift();
                 sourceBuffer.appendBuffer(new Uint8Array(chunk));
